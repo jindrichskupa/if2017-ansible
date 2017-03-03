@@ -1,7 +1,6 @@
 # Anslible
-
+# ![60%](./images/ansible-logo.png)
 ## InstallFest 2017
-
 Jindrich Skupa
 
 ---
