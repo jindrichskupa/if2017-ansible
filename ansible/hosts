@@ -1,0 +1,14 @@
+[webservers]
+web[01:10].example.com
+
+[dbservers]
+oracle.example.com ansible_connection=ssh ansible_user=oracle
+mysql.example.com
+postgres.example.com ansible_connection=ssh ansible_user=postgres
+
+[webservers:vars]
+ansible_user=admin
+
+[servers:children]
+webservers
+dbservers
