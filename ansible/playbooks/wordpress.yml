@@ -1,0 +1,69 @@
+---
+  hosts: tag_wordpress
+  tasks:
+  - name: Install libapache2-mod-php5
+    apt:
+      name="{{ item }}"
+      update_cache=yes state=latest
+    with_items:
+    - libapache2-mod-php5
+    - php5-mysql
+    - mysql-server
+    - MySQL-python
+
+  - name: Download latest WordPress release
+    get_url:
+      url: https://wordpress.org/latest.zip
+      dest: /tmp/wordpress-latest.zip
+
+  - name: Extract WordPress into /var/www
+    unarchive:
+      src: /tmp/wordpress-latest.zip
+      dest: /var/www/
+
+  - name: Create MySQL database
+    mysql_db:
+      name: "wordpress"
+      state: present
+
+  - name: Create MySQL User with Grants
+    mysql_user:
+      name: "wordpress"
+      password: "strasneSloziteHeslo"
+      priv: "wordpress.*:ALL"
+
+  - name: Copy Wordpress Config
+    copy:
+      src: /etc/ansible/files/wp-config.php
+      dest: /var/www/wordpress/wp-config.php
+
+  - name: Set Config Variables (password)
+    replace:
+      path: /var/www/wordpress/wp-config.php
+      regexp: "password_here"
+      replace: "strasneSloziteHeslo"
+
+  - name: Set Config Variables (username_here)
+    replace:
+      path: /var/www/wordpress/wp-config.php
+      regexp: "username_here"
+      replace: "wordpress"
+
+  - name: Set Config Variables (database_name_here)
+    replace:
+      path: /var/www/wordpress/wp-config.php
+      regexp: "database_name_here"
+      replace: "wordpress"
+
+  - name: Create Apache Vhost
+    template:
+      src: /etc/ansible/templates/apache_vhost.j2
+      dest: /etc/apache2/site-enabled/wordpress.conf
+
+  - name: Restart Apache2
+    become: true
+    service: name=apache2 state=restarted
+
+
+
+

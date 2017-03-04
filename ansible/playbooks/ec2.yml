@@ -1,0 +1,21 @@
+- hosts: localhost
+  connection: local
+  vars_files:
+  tasks:
+  - name: Create app server EC2 instances
+    ec2:
+      key_name: "installfest-key"
+      region: "eu-central-1"
+      instance_type: "t2.micro"
+      image: "ami-3291be54"
+      wait: yes
+      group: default
+      instance_tags:
+        application: "wordpress"
+      count_tag:
+        application: "wordpress"
+        exact_count: 1
+    register: ec2app
+
+
+

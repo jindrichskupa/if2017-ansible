@@ -1,5 +1,6 @@
-# Anslible
+<!--# Anslible-->
 # ![60%](./images/ansible-logo.png)
+http://docs.ansible.com
 ## InstallFest 2017
 Jindřich Skupa
 
@@ -12,7 +13,7 @@ Jindřich Skupa
 * Ukázkovy playbook - LAMP + WordPress
 * Učesání ukázky
 * Best practices
-* Otázky a snad i odpovědi
+* Otázky a odpovědi
 
 ---
 
@@ -204,6 +205,25 @@ $ ansible-playbook -i inventory -e -m ping ...
 * použijeme VZOR a nahrazení řetezců
 
 ```yaml
+   - name: Copy Wordpress Config
+     copy: 
+       src: /etc/ansible/files/wp-config.php
+       dest: /var/www/wordpress/wp-config.php
+   - name: Set Config Variables (password)
+     replace:
+       path: /var/www/wordpress/wp-config.php
+       regexp: "password_here"
+       replace: "strasneSloziteHeslo"
+   - name: Set Config Variables (username_here)
+     replace:
+       path: /var/www/wordpress/wp-config.php
+       regexp: "username_here"
+       replace: "wordpress"
+   - name: Set Config Variables (database_name_here)
+     replace:
+       path: /var/www/wordpress/wp-config.php
+       regexp: "database_name_here"
+       replace: "wordpress"
 ```
 
 ---
@@ -213,6 +233,10 @@ $ ansible-playbook -i inventory -e -m ping ...
 * použijeme J2 šablonu a nějaké ty proměnné
 
 ```yaml
+   - name: Create Apache Vhost
+   template:
+     src: /etc/ansible/templates/apache_vhost.j2
+     dest: /etc/apache2/site-enabled/wordpress.conf
 ```
 
 ---
