@@ -3,6 +3,7 @@
 http://docs.ansible.com
 ## InstallFest 2017
 Jindřich Skupa
+https://github.com/jindrichskupa/if2017-ansible/
 
 ---
 
@@ -25,8 +26,10 @@ Jindřich Skupa
 $ apt-get install python python-pip
 $ pip install ansible ansible-lint ansible-review
 
-$ mkdir -p /etc/ansible/{files,roles,playbooks}
-$ mkdir -p /etc/ansible/{vars,inventory}
+$ git clone \
+  https://githu.com/jindrichskupa/if2017-ansible
+  
+$ cp -r if2017-ansible/ansible /etc/
 ```
 
 ---
@@ -45,7 +48,7 @@ $ mkdir -p /etc/ansible/{vars,inventory}
 
 # Komponenty Ansible
 
-* Inventory (co spravujeme)
+* Inventory (co spravujeme, statické, dynamické)
 * Playbooks (co se má na serveru provést)
 * Roles (generická souvisjící tasky, Ansible Galaxy)
 * Vars (nastavení playbooků/rolí)
@@ -80,14 +83,21 @@ $ mkdir -p /etc/ansible/{vars,inventory}
 * přímé bez playbooku
 
 ```yaml
-$ ansible-playbook -i inventory -e -m ping ...
+$ ansible -i inventory/ec2.py ec2 -m shell -a 'uname -a'
 ```
 
 * s playbookem 
 
 ```yaml
-$ ansible-playbook -i inventory -e -m ping ...
+$ ansible-playbook -i inventory/ec2.py \
+  --extra-vars "env=$ENV" playbooks/wordpress.yml
 ```
+
+* kopie souboru
+```yaml
+$ ansible localhost -m copy -a "src=/tmp/x dest=/tmp/y"
+```
+
 
 ---
 
@@ -125,13 +135,13 @@ $ ansible-playbook -i inventory -e -m ping ...
         key_name: "installfest-key"
         region: "eu-central-1"
         instance_type: "t2.micro"
-        image: ""
+        image: "ami-3291be54"
         wait: yes
         group: default
         instance_tags:
-          application: "wordpress-test"
+          application: "wordpress"
         count_tag:
-          application: "wordpress-test"
+          application: "wordpress"
         exact_count: 1
       register: ec2app
 ```

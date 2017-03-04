@@ -1,13 +1,16 @@
-- hosts: localhost
+---
+- name: Create server on aws
+  hosts: localhost
   connection: local
   vars_files:
+  - /etc/ansible/vars/dummy.yml
   tasks:
   - name: Create app server EC2 instances
     ec2:
-      key_name: "installfest-key"
+      key_name: "id_rsa"
       region: "eu-central-1"
       instance_type: "t2.micro"
-      image: "ami-3291be54"
+      image: "ami-abff2ac4"
       wait: yes
       group: default
       instance_tags:

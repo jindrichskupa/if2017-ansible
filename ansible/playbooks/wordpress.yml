@@ -1,7 +1,16 @@
 ---
-  hosts: tag_wordpress
+- name: Install wordpress
+  become: true
+  become_user: root
+  remote_user: admin
+  hosts: tag_application_wordpress
+  vars:
+    apache_domain: "{{ inventory_hostname }}"
+    apache_docroot: /var/www/wordpress/
   tasks:
-  - name: Install libapache2-mod-php5
+
+  - name: Install LAMP packages
+    become: true
     apt:
       name="{{ item }}"
       update_cache=yes state=latest
@@ -9,17 +18,20 @@
     - libapache2-mod-php5
     - php5-mysql
     - mysql-server
-    - MySQL-python
+    - python-pymysql
+    - python-mysqldb
+    - unzip
 
   - name: Download latest WordPress release
     get_url:
-      url: https://wordpress.org/latest.zip
+      url: http://wordpress.org/latest.zip
       dest: /tmp/wordpress-latest.zip
 
   - name: Extract WordPress into /var/www
     unarchive:
       src: /tmp/wordpress-latest.zip
       dest: /var/www/
+      remote_src: true
 
   - name: Create MySQL database
     mysql_db:
@@ -39,26 +51,29 @@
 
   - name: Set Config Variables (password)
     replace:
-      path: /var/www/wordpress/wp-config.php
+      dest: /var/www/wordpress/wp-config.php
       regexp: "password_here"
       replace: "strasneSloziteHeslo"
+      backup: yes
 
   - name: Set Config Variables (username_here)
     replace:
-      path: /var/www/wordpress/wp-config.php
+      dest: /var/www/wordpress/wp-config.php
       regexp: "username_here"
       replace: "wordpress"
+      backup: yes
 
   - name: Set Config Variables (database_name_here)
     replace:
-      path: /var/www/wordpress/wp-config.php
+      dest: /var/www/wordpress/wp-config.php
       regexp: "database_name_here"
       replace: "wordpress"
+      backup: yes
 
   - name: Create Apache Vhost
     template:
       src: /etc/ansible/templates/apache_vhost.j2
-      dest: /etc/apache2/site-enabled/wordpress.conf
+      dest: /etc/apache2/sites-enabled/wordpress.conf
 
   - name: Restart Apache2
     become: true
